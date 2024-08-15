@@ -139,7 +139,7 @@ def display_row(index):
         col.divider()
         col.subheader(f"{col_data['tournament'].replace(';', ', ')}")
         # col.write(f"**Game:** {col_data['home_team']} vs {col_data['away_team']}")
-        col.write(f"[{col_data['home_team']} vs {col_data['away_team']}]({col_data['url']})")
+        col.subheader(f"[{col_data['home_team']} vs {col_data['away_team']}]({col_data['url']})")
         col.write(f"***Odd: {col_data['odd']}***")
         ratio = round(row_data['arbitrage']/col_data['odd'],3)
         col.write(f"**Bet ratio: {ratio}**")
