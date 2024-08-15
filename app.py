@@ -129,20 +129,23 @@ def display_row(index):
     
     for i, col in enumerate(cols):
         k = market_keys[i]
-        col.write(k.title())
+        
         col_data = outcomes[i][k]
         
         # col.write(f"**Event ID:** {col_data['event_id']}")
         
-        col.write(f"**Bookmaker:** {col_data['bookmaker']}")
+        col.subheader(f"**{col_data['bookmaker']}** ")
+        col.write(k.title())
         col.divider()
         col.subheader(f"{col_data['tournament'].replace(';', ', ')}")
         # col.write(f"**Game:** {col_data['home_team']} vs {col_data['away_team']}")
         col.write(f"[{col_data['home_team']} vs {col_data['away_team']}]({col_data['url']})")
         col.write(f"***Odd: {col_data['odd']}***")
-        wrong = col.checkbox('Wrong match', key= i+1)
-        inactive = col.checkbox('Inactive', key= (100-i))
-        actual_odd = col.number_input('Current odd?', key = 200 -i, value=col_data['odd'])
+        ratio = round(row_data['arbitrage']/col_data['odd'],3)
+        col.write(f"**Bet ratio: {ratio}**")
+        wrong = col.checkbox('Wrong match', key= f"1_{index}_{i+1}")
+        inactive = col.checkbox('Inactive', key= f"2_{index}_{i+1}")
+        actual_odd = col.number_input('Current odd?', key = f"3_{index}_{i+1}", value=col_data['odd'])
         # col.write(f"[Link]({col_data['url']})")  # Avoid using links as per the rules
 
 # Next button logic
