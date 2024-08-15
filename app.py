@@ -134,8 +134,8 @@ def display_row(index):
         
         # col.write(f"**Event ID:** {col_data['event_id']}")
         
-        col.subheader(f"**{col_data['bookmaker']}** ")
-        col.write(k.title())
+        col.subheader(f"**{k.title()}: {col_data['bookmaker']}** ")
+        # col.write(k.title())
         col.divider()
         col.subheader(f"{col_data['tournament'].replace(';', ', ')}")
         # col.write(f"**Game:** {col_data['home_team']} vs {col_data['away_team']}")
@@ -147,6 +147,7 @@ def display_row(index):
         inactive = col.checkbox('Inactive', key= f"2_{index}_{i+1}")
         actual_odd = col.number_input('Current odd?', key = f"3_{index}_{i+1}", value=col_data['odd'])
         # col.write(f"[Link]({col_data['url']})")  # Avoid using links as per the rules
+        col.divider()
 
 # Next button logic
 def next_row():
