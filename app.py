@@ -91,7 +91,7 @@ def get_data(start):
 if 'index' not in st.session_state:
     st.session_state.index = 0
 
-minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 900, min_value= 660,step = 15)
+minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 90, min_value= 75,step = 15)
 start = time_in_past(minutes_past=minutes_past)
 try:
     df = get_data(start)
