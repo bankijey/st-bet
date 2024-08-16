@@ -122,7 +122,7 @@ def display_row(index):
     st.subheader(f"*Profit:* {round(100*(row_data['arbitrage'] - 1), 3)}%")
     st.divider()
     outcomes = row_data['market']['outcomes']
-    market_keys = [o["market_key"] for o in outcomes]
+    market_keys = [list(o.keys())[0] for o in outcomes]
     
     cols = st.columns(len(outcomes))
     
