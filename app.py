@@ -91,12 +91,13 @@ def get_data(start):
 if 'index' not in st.session_state:
     st.session_state.index = 0
 
-minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 7500, min_value= 75,step = 15)
+minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 900, min_value= 660,step = 15)
 start = time_in_past(minutes_past=minutes_past)
 try:
     df = get_data(start)
 except Exception as e:
     st.write(e)
+    
 # Display the current row of data
 def process_col(col, data):
     if not data['url'].contains('https:'):
@@ -122,15 +123,14 @@ def display_row(index):
     st.subheader(f"*Profit:* {round(100*(row_data['arbitrage'] - 1), 3)}%")
     st.divider()
     outcomes = row_data['market']['outcomes']
-    market_keys = [list(o.keys())[0] for o in outcomes]
-    
+    market_keys = [o['market_key'] for o in outcomes]
     cols = st.columns(len(outcomes))
     
     
     for i, col in enumerate(cols):
         k = market_keys[i]
         
-        col_data = outcomes[i][k]
+        col_data = outcomes[i]
         
         # col.write(f"**Event ID:** {col_data['event_id']}")
         
