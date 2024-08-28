@@ -7,7 +7,9 @@ import os
 import json
 from datetime import datetime, timezone, timedelta
 import pytz
-import plotly.graph_objects as go
+
+
+
 load_dotenv()
 url= os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
