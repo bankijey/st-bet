@@ -7,7 +7,7 @@ import os
 import json
 from datetime import datetime, timezone, timedelta
 import pytz
-
+import plotly.graph_objects as go
 load_dotenv()
 url= os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
@@ -83,20 +83,34 @@ def get_data(start):
     df = pd.DataFrame(data).query('1.005 <= arbitrage <= 1.05').sort_values('start', ignore_index = True, ascending = False)
     return df
 
-
+def get_eventIds(row):
+        eids = ';'.join([o['event_id'] for o in row.market['outcomes']])
+        
+        return f"{row.market['key']}=={eids}"
     
+
+
+
+minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 75, min_value= 75,step = 15)
+start = time_in_past(minutes_past=minutes_past)
+try:
+    df = get_data(start)
+    df['eid_key'] = df.apply(lambda row: get_eventIds(row), axis = 1)
+    old_len = len(df)
+    df = df.drop_duplicates(subset=['arbitrage', 'eid_key'], keep = 'last', ignore_index=True)
+     
+    st.write(df)
+    
+    st.write(f"Droped {old_len - len(df)} duplicate(s)")
+    
+except Exception as e:
+    st.write(e)
+
 
 # Initialize session state variables
 
 if 'index' not in st.session_state:
     st.session_state.index = 0
-
-minutes_past = st.sidebar.number_input('Results from how many minutes ago?:', value = 90, min_value= 75,step = 15)
-start = time_in_past(minutes_past=minutes_past)
-try:
-    df = get_data(start)
-except Exception as e:
-    st.write(e)
     
 # Display the current row of data
 def process_col(col, data):
@@ -111,6 +125,7 @@ def process_col(col, data):
     # return col_data
 
 
+    
 def display_row(index):
     st.header(f"{index+1} of {len(df)}")
     row_data = df.iloc[index]
@@ -120,11 +135,15 @@ def display_row(index):
     
     # st.write(f"{time_difference(row_data['start'])}")
     st.subheader(f"**Market:** {market_translation[row_data['market']['key']]}")
-    st.subheader(f"*Profit:* {round(100*(row_data['arbitrage'] - 1), 3)}%")
+    profit = 100*(row_data['arbitrage'] - 1)
+    st.subheader(f"*Profit:* {round(profit, 3)}%")
+    
     st.divider()
     outcomes = row_data['market']['outcomes']
     market_keys = [o['market_key'] for o in outcomes]
+    odds = [o['odd'] for o in outcomes]
     cols = st.columns(len(outcomes))
+    wrongs = [0,0,0]
     
     
     for i, col in enumerate(cols):
@@ -143,11 +162,25 @@ def display_row(index):
         col.write(f"***Odd: {col_data['odd']}***")
         ratio = round(row_data['arbitrage']/col_data['odd'],3)
         col.write(f"**Bet ratio: {ratio}**")
+        
+        
         wrong = col.checkbox('Wrong match', key= f"1_{index}_{i+1}")
         inactive = col.checkbox('Inactive', key= f"2_{index}_{i+1}")
         actual_odd = col.number_input('Current odd?', key = f"3_{index}_{i+1}", value=col_data['odd'])
+        
+        if actual_odd != col_data['odd']:
+            odds[i] = actual_odd
+            new_arb = 1 / sum(1/i for i in odds)
+            new_profit = 100*(new_arb - 1)
+            if new_profit > 0:
+                st.subheader(f"*Current Profit:* {round(new_profit, 3)}%")
+            else:
+                st.subheader(f"*Cuurent Loss:* {round(new_profit, 3)}%")
+
         # col.write(f"[Link]({col_data['url']})")  # Avoid using links as per the rules
-        col.divider()
+        # col.divider()
+
+    
 
 # Next button logic
 def next_row():
